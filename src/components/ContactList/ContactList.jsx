@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import styles from './ContactList.module.css';
+import { connect } from 'react-redux';
+import contactsActions from '../../redux/contacts/contacts-actions';
 const ContactItem = ({ id, name, number, onRemove }) => {
   return (
     <li className={styles.listItem} key={id}>
@@ -22,11 +24,52 @@ const ContactList = ({ contacts, onRemove }) => {
   );
 };
 
-ContactItem.propTypes = {
-  id: PropTypes.string.isRequired,
-  name: PropTypes.string.isRequired,
-  number: PropTypes.string,
-  onRemove: PropTypes.func,
+// ContactItem.propTypes = {
+//   id: PropTypes.string.isRequired,
+//   name: PropTypes.string.isRequired,
+//   number: PropTypes.string,
+//   onRemove: PropTypes.func,
+// };
+
+// getFilteredContacts = () => {
+//   const { contacts, filter } = this.state;
+//   return contacts.filter(contact =>
+//     contact.name.toLowerCase().includes(filter.toLowerCase()),
+//   );
+// };
+
+// const mapStateToProps = state => {
+//   const { items, filter } = state.contacts;
+//   const normalisedFilter = filter.toLowerCase;
+//   const visibleContacts = items.filter(({ text }) =>
+//     text.toLowerCase().includes(normalisedFilter),
+//   );
+//   // return { contacts: state.contacts.items };
+//   return {
+//     contacts: visibleContacts,
+//   };
+// };
+// const getVisibleContacts = (allContacts, filter) => {
+//   // const normalisedFilter = filter.toLowerCase();
+//   return allContacts.filter(({ name }) =>
+//     name.toLowerCase().includes(filter.toLowerCase()),
+//   );
+// };
+// const mapStateToProps = ({ contacts: { items, filter } }) => ({
+//   contacts: getVisibleContacts(items, filter),
+// });
+const mapStateToProps = state => {
+  const { items, filter } = state.contacts;
+
+  // const visibleContacts = items.filter(({ name }) =>
+  //   name.toLowerCase.includes(filter.toLowerCase()),
+  // );
+  return {
+    contacts: items.filter(({ name }) => name.includes(filter.toLowerCase())),
+  };
 };
 
-export default ContactList;
+const mapDispatchToProps = dispatch => ({
+  onRemove: id => dispatch(contactsActions.contactRemove(id)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ContactList);

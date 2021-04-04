@@ -1,6 +1,8 @@
 import { Component } from 'react';
 import { v4 as uuid } from 'uuid';
 import styles from './ContactForm.module.css';
+import { connect } from 'react-redux';
+import contactsActions from '../../redux/contacts/contacts-actions';
 const initionalState = {
   name: '',
   number: '',
@@ -11,6 +13,7 @@ class ContactForm extends Component {
   changeFormHandler = ({ target }) => {
     const { name, value } = target;
     this.setState({ [name]: value });
+    console.log(this.props);
   };
 
   submitFormHandler = event => {
@@ -21,18 +24,20 @@ class ContactForm extends Component {
     const isValidForm = this.validateForm();
     if (!isValidForm) return;
 
-    onAdd({ id: uuid(), name, number });
+    onAdd(name, number);
     this.resetForm();
   };
 
   validateForm = () => {
     const { name, number } = this.state;
-    const { uniqueCheck } = this.props;
+    const { contacts } = this.props;
     if (!name || !number) {
       alert('Fill in all fields');
       return false;
     }
-    return uniqueCheck(name);
+    const isUnique = contacts.find(contact => contact.name === name);
+    isUnique && alert('Contact is alredy in cotactList');
+    return !isUnique;
   };
 
   resetForm = () => this.setState(initionalState);
@@ -64,5 +69,8 @@ class ContactForm extends Component {
     );
   }
 }
-
-export default ContactForm;
+const mapStateToProps = state => ({ contacts: state.contacts.items });
+const mapDispatchToProps = dispatch => ({
+  onAdd: (name, number) => dispatch(contactsActions.contactsAdd(name, number)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(ContactForm);
